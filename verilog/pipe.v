@@ -66,9 +66,13 @@ module Alu(z, x, y, op);
                 z = {1'b1,x[6:0]}>>expnormx;
             end
             `OPi2f: begin
-                normx = x<<normxshift+1;
-                expnormx = (8-normxshift)+127+7;
-                z = {x[15], expnormx, normx[15:9]};
+                if (x == 0) begin
+                    z = 0;
+                end else begin
+                    normx = x<<normxshift+1;
+                    expnormx = (8-normxshift)+127+7;
+                    z = {x[15], expnormx, normx[15:9]};
+                end
             end
         endcase
     end
@@ -99,9 +103,9 @@ module bench;
     Alu uut(z,x,y,op);
 
     initial begin
+        //__START TB__
         $dumpfile("dump.vcd");
         $dumpvars(0, uut);
-        //__START TB__
 
         //__END TB__
     end
