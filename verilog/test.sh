@@ -76,3 +76,7 @@ rm -f pre.v temp.v post.v temp
 echo
 echo -n "--> Testing has finished: "
 summarize
+
+if (($numbad != 0)); then
+    exit 1
+fi

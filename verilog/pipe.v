@@ -57,8 +57,8 @@ module Alu(z, x, y, op);
                 mulfrac = {1'b1,x[6:0]}*{1'b1,y[6:0]};
                 normz = mulfrac<<mulfzshift+1;
                 expnormx = 8-(x[14:7]-127 + y[14:7]-127 + mulfzshift)+127+7;
-                $display("%d", 8-(x[14:7]-127 + y[14:7]-127 + mulfzshift)+127+7);
-                $display("%d %d %d", x[14:7]-127, y[14:7]-127, mulfzshift);
+                //$display("%d", 8-(x[14:7]-127 + y[14:7]-127 + mulfzshift)+127+7);
+                //$display("%d %d %d", x[14:7]-127, y[14:7]-127, mulfzshift);
                 z = {x[15]^y[15], expnormx, normz[15:9]};
             end
             `OPf2i: begin
