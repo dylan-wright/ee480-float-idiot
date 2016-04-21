@@ -1,5 +1,7 @@
 # EE 480 Assignment 4: Floating
 
+[![Build Status](http://intellproject.com:8090/buildStatus/icon?job=ee480-float-idiot)](http://intellproject.com:8090/job/ee480-float-idiot)
+
 ## Team 2C
 * Dylan Wright
 * Evan Whitmer
@@ -22,4 +24,5 @@ The .gitignore will prevent the vmem's from being added to the repo.
 ### idiocc.c
 Dr. Dietz's compiler with a small fix. His was not appending a label with
 an underscore and therefore generating programs that cannot be run. 
+
 
