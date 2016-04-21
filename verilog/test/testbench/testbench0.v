@@ -1,0 +1,18 @@
+        #10;
+        x = 1;
+        op = `OPi2f;
+        #10;
+        $display("%h", z);
+        x = 16'h3f80;
+        op = `OPf2i;
+        #10;
+        x = 16'h4040;
+        y = 16'h4040;
+        op = `OPmulf;
+        #10;
+        $display("%h", z);
+        x = 16'h4120;
+        y = 16'h41a0;
+        op = `OPmulf;
+        #10;
+        $display("%h", z);
