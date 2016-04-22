@@ -1,8 +1,0 @@
---- test/testbench/testbench4.expected.out	2016-04-22 14:17:53.824453021 -0400
-+++ test/testbench/testbench4.out	2016-04-22 14:35:56.706394572 -0400
-@@ -3,4 +3,4 @@
- 0000
- 3f80
- 4040
--4120
-+4140

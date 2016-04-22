@@ -58,6 +58,7 @@ module Alu(z, x, y, op);
             `OPdup: z = x;
             `OPinvf: ;
             `OPaddf:    begin
+                //$display("%h %h",x,y);
                 if (x == 0) begin
                     z = y;
                 end else if (y == 0) begin
@@ -71,20 +72,24 @@ module Alu(z, x, y, op);
                         expnormx = y[14:7];
                     end else if (x[14:7] > y[14:7]) begin
                         diff = (x[14:7]-127)-(y[14:7]-127);
-                        addfrac = {({1'b1,x[6:0]})+{1'b1,y[6:0]}>>diff, 8'b0};
-                        normz = addfrac<<addzshift;
+                        addfrac = {({1'b1,x[6:0]})+({1'b1,y[6:0]}>>diff), 8'b0};
+                        normz = addfrac<<addzshift+1;
                         addsign=0;
-                        expnormx = x[14:7];
+                        if (diff == 1) begin
+                            expnormx = x[14:7]+diff;
+                        end else begin
+                            expnormx = x[14:7];
+                        end
                     end else begin
                         addfrac = {1'b1,x[6:0]}+{1'b1,y[6:0]};
                         normz = addfrac<<addzshift+1;
                         addsign = 0;
                         diff = 0;
-                    if (addzshift == 0) begin
-                        expnormx = (addzshift+1)+127;
-                    end else begin
-                        expnormx = (x[14:7]-127 + y[14:7]-127)+127;
-                    end
+                        if (addzshift == 0) begin
+                            expnormx = (addzshift+1)+127;
+                        end else begin
+                            expnormx = (x[14:7]-127 + y[14:7]-127)+127;
+                        end
                     end
 
                     z = {addsign,expnormx,normz[15:9]};
