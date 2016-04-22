@@ -30,15 +30,22 @@ module Alu(z, x, y, op);
     input `WORD x, y;
     input `ALUOP op;
 
-    wire [4:0] normxshift, normyshift, mulfzshift;
+    wire [4:0] normxshift, normyshift, mulfzshift, addzshift;
     reg `WORD normx;
     reg [7:0] expnormx;
     reg [7:0] signormx;
     reg [15:0] mulfrac;
     reg `WORD normz;
 
+    reg addsign;
+    reg `WORD denorm;
+    reg `WORD addfrac;
+    reg [7:0] diff;
+
     lead0s shiftx (normxshift, x);
+    lead0s shifty (normyshift, y);
     lead0s shiftm (mulfzshift, mulfrac);
+    lead0s shifta (addzshift, addfrac);
 
     always @(*) begin
         case (op)
@@ -51,7 +58,37 @@ module Alu(z, x, y, op);
             `OPdup: z = x;
             `OPinvf: ;
             `OPaddf:    begin
-                
+                if (x == 0) begin
+                    z = y;
+                end else if (y == 0) begin
+                    z = x;
+                end else begin
+                    if (x[14:7] < y[14:7]) begin
+                        diff = (y[14:7]-127)-(x[14:7]-127);
+                        addfrac = {({1'b1,x[6:0]}>>diff)+{1'b1,y[6:0]}, 8'b0};
+                        normz = addfrac<<addzshift+1;
+                        addsign=0;
+                        expnormx = y[14:7];
+                    end else if (x[14:7] > y[14:7]) begin
+                        diff = (x[14:7]-127)-(y[14:7]-127);
+                        addfrac = {({1'b1,x[6:0]})+{1'b1,y[6:0]}>>diff, 8'b0};
+                        normz = addfrac<<addzshift;
+                        addsign=0;
+                        expnormx = x[14:7];
+                    end else begin
+                        addfrac = {1'b1,x[6:0]}+{1'b1,y[6:0]};
+                        normz = addfrac<<addzshift+1;
+                        addsign = 0;
+                        diff = 0;
+                    if (addzshift == 0) begin
+                        expnormx = (addzshift+1)+127;
+                    end else begin
+                        expnormx = (x[14:7]-127 + y[14:7]-127)+127;
+                    end
+                    end
+
+                    z = {addsign,expnormx,normz[15:9]};
+                end
             end
             `OPmulf: begin
                 if (x == 0 || y == 0) begin
