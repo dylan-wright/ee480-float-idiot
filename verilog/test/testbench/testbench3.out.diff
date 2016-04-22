@@ -1,7 +1,0 @@
---- test/testbench/testbench3.expected.out	2016-04-21 19:53:00.860805911 -0400
-+++ test/testbench/testbench3.out	2016-04-21 19:53:30.555804308 -0400
-@@ -1,2 +1,2 @@
--4110
--4348
-+4586
-+459f

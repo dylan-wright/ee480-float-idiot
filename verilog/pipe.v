@@ -34,7 +34,7 @@ module Alu(z, x, y, op);
     reg `WORD normx;
     reg [7:0] expnormx;
     reg [7:0] signormx;
-    reg `WORD mulfrac;
+    reg [15:0] mulfrac;
     reg `WORD normz;
 
     lead0s shiftx (normxshift, x);
@@ -54,12 +54,23 @@ module Alu(z, x, y, op);
                 
             end
             `OPmulf: begin
-                mulfrac = {1'b1,x[6:0]}*{1'b1,y[6:0]};
-                normz = mulfrac<<mulfzshift+1;
-                expnormx = 8-(x[14:7]-127 + y[14:7]-127 + mulfzshift)+127+7;
-                //$display("%d", 8-(x[14:7]-127 + y[14:7]-127 + mulfzshift)+127+7);
-                //$display("%d %d %d", x[14:7]-127, y[14:7]-127, mulfzshift);
-                z = {x[15]^y[15], expnormx, normz[15:9]};
+                if (x == 0 || y == 0) begin
+                    z = 0;
+                end else begin
+                    mulfrac = {1'b1,x[6:0]}*{1'b1,y[6:0]};
+                    //$display("%b %b", x[6:0], y[6:0]);
+                    //$display("%d", mulfzshift+1);
+                    //$display("%b", mulfrac<<mulfzshift+1);
+                    normz = mulfrac<<mulfzshift+1;
+                    //$display("%b", normz);
+                    
+                    if (mulfzshift == 0) begin
+                        expnormx = (x[14:7]-127 + y[14:7]-127 + mulfzshift+1)+127;
+                    end else begin
+                        expnormx = (x[14:7]-127 + y[14:7]-127)+127;
+                    end
+                    z = {x[15]^y[15], expnormx, normz[15:9]};
+                end
             end
             `OPf2i: begin
                 expnormx = -(x[14:7]-127-7);
@@ -70,7 +81,8 @@ module Alu(z, x, y, op);
                     z = 0;
                 end else begin
                     normx = x<<normxshift+1;
-                    expnormx = (8-normxshift)+127+7;
+                    //expnormx = (8-normxshift)+127+7;
+                    expnormx = 127+7+8-(normxshift);
                     z = {x[15], expnormx, normx[15:9]};
                 end
             end
