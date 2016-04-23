@@ -12,4 +12,4 @@ addf: addf.c
 	gcc -o addf addf.c
 
 clean:
-	rm mulf i2f float dump.vcd
+	rm mulf i2f float dump.vcd add
