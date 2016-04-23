@@ -4,6 +4,7 @@
 
 \documentclass[conference]{IEEEtran}
 \usepackage{graphicx}
+\usepackage{hyperref}
 
 \begin{document}
 \title{Assignment 4: Floating\\Implementor's Notes}
@@ -17,6 +18,106 @@
 \maketitle
 
 \begin{abstract}
+This document serves as the Implementor's Notes for Team2C's EE 480 Assignment
+4. This document intends to describe the methodology used to implement the 
+project as well as any difficulties and important details regarding this task.
 \end{abstract}
 
+\section{Definitions and Standards}
+\subsection{IDIOT}
+IDIOT (Instruction Definition In Our Target) is the instruction set implemented
+by this project. IDIOT is the instruction set created for the Spring 2016 
+version of EE 480.\cite{idiot-isa}
+\subsection{AIK}
+AIK (Assembler Interpretor from Kentucky) is the tool used to create assembly
+language programs in the IDIOT ISA.\cite{aik}
+\subsection{BAD}
+BAD (Barely Acceptable Decimal) is the floating point format implemented by
+this project. BAD is a specification developed for the Spring 2016 version
+of EE 480.\cite{idiot-float} This format is a varient of IEEE Std 754 
+\texttt{binary32}.\cite{ieee-754} BAD drops all subnormal values except for
+positive zero and truncates the 16 least significant bits of the significand.
+
+\section{Implementation}
+\subsection{Framework}
+This is a Make project. The entire project can be built using the root Makefile
+and any directory with a Makefile can be built using that. The project is split
+into a \texttt{doc/}, 
+\texttt{IDIOT/} and \texttt{verilog/} directory.
+\subsubsection{\texttt{doc/}}
+This directory is dedicated to documentation. In particular it contains the
+\LaTeX source files for the implementor's notes (this document).
+\subsubsection{\texttt{IDIOT/}}
+This directory is dedicated to the IDIOT specification and the test program
+build framework. Of particular interest are the following files:
+\paragraph{\texttt{aik.py}} This file is a python3 script that can be used
+to interface with the AIK cgi interface hosted on \texttt{aggregate.org}.
+This script greatly simplifies the process of building individual test 
+programs.
+\paragraph{\texttt{build.sh}} This file is a bash script that can be used
+to build all .idiot programs in the directory. This produces the .vmem files
+which can be used to exercise the processor.
+\subsubsection{\texttt{verilog/}}
+This directory is dedicated to the verilog inplementation of the project and
+the framework used to test it. Of particular interest are the following files:
+\paragraph{\texttt{pipe.v}} This file is the verilog source code which 
+implements the processor. 
+\paragraph{\texttt{test.sh}} This file is used to test the processor. At
+the moment it runs the unit tests in \texttt{tests/testbenches/}.
+
+\subsection{Floating Point Instructions}
+The following instructions were added to the previously implemented integer
+instructions. They are described in the order they were implemented.
+\subsubsection{\texttt{i2f}}
+(integer to float) is an instruction which converts a 16-bit
+integer to a 16-bit float. This instruction converts the x signal of the ALU.
+This is done by normalizing the integer, determining
+the exponent, sign. For the subnormal value positive 0, the input is passed
+directly through the ALU.
+\subsubsection{\texttt{f2i}}
+(float to integer) is an instruction which converts a 16-bit
+float to a 16-bit integer. This instruction converts the x signal of the ALU.
+This is done by denormalizing the significand and adjusting the signal if the
+sign bit is set. 
+%For the subnormal value positive 0, the input is passed directly through the ALU.
+\subsubsection{\texttt{mulf}}
+(multiply float) is an instruction which multiplies two 16-bit
+floats. This instruction multiplies the x and y signals of the ALU. This is 
+done by adding the exponents, multiplying the significands, and setting the
+sign bit. For the subnormal value positive 0, the output is set to positive
+0.
+\subsubsection{\texttt{addf}}
+(add float) is an instruction which adds two 16-bit floats. This
+instruction adds the x and y signals of the ALU. This is done by denormalizing
+the float with the smaller exponent, adding or subtracting the significands,
+and normalizing the result. For the subnormal value positive 0, the input which
+is not positive 0 is passed directly through the ALU.
+\subsubsection{\texttt{invf}}
+(invert float) is an instruction which computes the inverse of a 16-bit
+float. This instruction inverts the x signal of the ALU. This is done using
+a look up table provided for the assignment.\cite{invf-lut}
+\subsection{Pipeline Integration}
+
+\section{Issues}
+
+\section{Testing}
+\subsection{Continuous Integration}
+In an effort to increase productivity and test usefullness, this group has
+been using a Jenkins continuous integration server. This server is running
+on a server Dylan Wright operates.\footnote{\url{intellproject.com:8090}} 
+The server is configured to attempt to
+build whenever the project GitHub recieves a commit. The build process makes
+all source files and reports if any step fails. Additionally it runs the
+unit test script (\texttt{verilog/test.sh}) which will cause the build to fail
+if any test case fails.
+\subsection{Floating Point Unit Testing}
+\subsection{Pipeline Program Testing}
+
+\section{Philosophy}
+\subsection{Sufficiency}
+\subsection{Necessity}
+\subsection{Usefulness}
+
+\bibliographystyle{IEEEtran}
+\bibliography{notes}
 \end{document}
