@@ -39,6 +39,7 @@ module Alu(z, x, y, op);
 
     reg addsign;
     reg `WORD denorm;
+    reg `WORD norm;
     reg `WORD addfrac;
     reg [7:0] diff;
 
@@ -64,34 +65,33 @@ module Alu(z, x, y, op);
                 end else if (y == 0) begin
                     z = x;
                 end else begin
-                    if (x[14:7] < y[14:7]) begin
-                        diff = (y[14:7]-127)-(x[14:7]-127);
-                        addfrac = {({1'b1,x[6:0]}>>diff)+{1'b1,y[6:0]}, 8'b0};
-                        normz = addfrac<<addzshift+1;
-                        addsign=0;
-                        expnormx = y[14:7];
-                    end else if (x[14:7] > y[14:7]) begin
-                        diff = (x[14:7]-127)-(y[14:7]-127);
-                        addfrac = {({1'b1,x[6:0]})+({1'b1,y[6:0]}>>diff), 8'b0};
-                        normz = addfrac<<addzshift+1;
-                        addsign=0;
-                        if (diff == 1) begin
-                            expnormx = x[14:7]+diff;
+                    if (x[14:7] == y[14:7]) begin
+                        norm = {1'b1, x[6:0]};
+                        denorm = {1'b1, x[6:0]};
+                        addsign = x[15]&y[15];
+                        if (x[15]^y[15] & x[6:0] == y[6:0]) begin 
+                            addfrac = 0;
+                            expnormx = 0;
                         end else begin
-                            expnormx = x[14:7];
+                            addfrac = norm+denorm;
+                            expnormx = (x[14:7]<y[14:7] ? y[14:7] : x[14:7]) + 
+                                        (8-addzshift);
                         end
                     end else begin
-                        addfrac = {1'b1,x[6:0]}+{1'b1,y[6:0]};
-                        normz = addfrac<<addzshift+1;
-                        addsign = 0;
-                        diff = 0;
-                        if (addzshift == 0) begin
-                            expnormx = (addzshift+1)+127;
-                        end else begin
-                            expnormx = (x[14:7]-127 + y[14:7]-127)+127;
+                        if (x[14:7] < y[14:7]) begin
+                            norm = {1'b1, y[6:0]};
+                            denorm = {1'b1, x[6:0]} >> (y[14:7]-x[14:7]);
+                            addsign = y[15]&~x[15];
+                        end else if (x[14:7] > y[14:7]) begin
+                            norm = {1'b1, x[6:0]};
+                            denorm = {1'b1, y[6:0]} >> (x[14:7]-y[14:7]);
+                            addsign = x[15]&~y[15];
                         end
+                        expnormx = (x[14:7]<y[14:7] ? y[14:7] : x[14:7]) + 
+                                    (8-addzshift);
+                        addfrac = norm+denorm;
                     end
-
+                    normz = addfrac<<addzshift+1;
                     z = {addsign,expnormx,normz[15:9]};
                 end
             end
@@ -100,16 +100,10 @@ module Alu(z, x, y, op);
                     z = 0;
                 end else begin
                     mulfrac = {1'b1,x[6:0]}*{1'b1,y[6:0]};
-                    //$display("%b %b", x[6:0], y[6:0]);
-                    //$display("%d", mulfzshift+1);
-                    //$display("%b", mulfrac<<mulfzshift+1);
                     normz = mulfrac<<mulfzshift+1;
-                    //$display("%b", normz);
-                    
-                    if (mulfzshift == 0) begin
-                        expnormx = (x[14:7]-127 + y[14:7]-127 + mulfzshift+1)+127;
-                    end else begin
-                        expnormx = (x[14:7]-127 + y[14:7]-127)+127;
+                    expnormx = x[14:7] + y[14:7] - 127;
+                    if (mulfrac[15]) begin
+                        expnormx += 1;
                     end
                     z = {x[15]^y[15], expnormx, normz[15:9]};
                 end
@@ -123,7 +117,6 @@ module Alu(z, x, y, op);
                     z = 0;
                 end else begin
                     normx = x<<normxshift+1;
-                    //expnormx = (8-normxshift)+127+7;
                     expnormx = 127+7+8-(normxshift);
                     z = {x[15], expnormx, normx[15:9]};
                 end
