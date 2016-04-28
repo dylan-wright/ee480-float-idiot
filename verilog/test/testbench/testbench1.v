@@ -13,7 +13,7 @@ x = 5;
 #1 $display("%h", z);
 x = 6;
 #1 $display("%h", z);
-x = 21235
+x = 21235;
 #1 $display("%h", z);
-x = -13535
+x = -13535;
 #1 $display("%h", z);
