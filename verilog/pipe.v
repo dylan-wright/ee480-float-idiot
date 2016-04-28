@@ -30,7 +30,8 @@ module Alu(z, x, y, op);
     input `WORD x, y;
     input `ALUOP op;
 
-    wire [4:0] normxshift, normyshift, mulfzshift, addzshift;
+    wire [4:0] normxshift, normyshift, mulfzshift, addzshift, normnegxshift;
+    reg `WORD negx;
     reg `WORD normx;
     reg [7:0] expnormx;
     reg [7:0] signormx;
@@ -44,6 +45,7 @@ module Alu(z, x, y, op);
     reg [7:0] diff;
 
     lead0s shiftx (normxshift, x);
+    lead0s shiftnegx (normnegxshift, negx);
     lead0s shifty (normyshift, y);
     lead0s shiftm (mulfzshift, mulfrac);
     lead0s shifta (addzshift, addfrac);
@@ -110,14 +112,29 @@ module Alu(z, x, y, op);
             end
             `OPf2i: begin
                 expnormx = -(x[14:7]-127-7);
-                z = {1'b1,x[6:0]}>>expnormx;
+                if (x[15]) begin
+                    z = {1'b1,x[6:0]}>>expnormx;
+                    //$display("%d", x[14:7]);
+                    //$display("%b", {1'b1, x[6:0]});
+                    //
+                    //$display("%d", expnormx);
+                    z = ~z+1;
+                end else begin
+                    z = {1'b1,x[6:0]}>>expnormx;
+                end
             end
             `OPi2f: begin
                 if (x == 0) begin
                     z = 0;
                 end else begin
-                    normx = x<<normxshift+1;
-                    expnormx = 127+7+8-(normxshift);
+                    if (x[15]) begin
+                        negx = ~x+1;
+                        normx = negx<<normnegxshift+1;
+                        expnormx = 127+7+8-(normnegxshift);
+                    end else begin
+                        normx = x<<normxshift+1;
+                        expnormx = 127+7+8-(normxshift);
+                    end
                     z = {x[15], expnormx, normx[15:9]};
                 end
             end
