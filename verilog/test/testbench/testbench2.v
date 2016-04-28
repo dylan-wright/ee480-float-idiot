@@ -13,3 +13,7 @@ x = 16'h40a0;
 #10 $display("%h", z);
 x = 16'h40c0;
 #10 $display("%h", z);
+x = 16'h46a5
+#1 $display("%h", z);
+x = 16'hc653
+#1 $display("%h", z);
