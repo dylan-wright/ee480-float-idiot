@@ -56,7 +56,7 @@ do
     sed -n '/__START TB__/,$!p' < pipe.v > pre.v
     sed -n '/__END TB__/,$p' < pipe.v > post.v
     cat pre.v $f post.v > temp.v
-    $compiler temp.v -o temp
+    $compiler -Wno-anachronisms temp.v -o temp
     $engine temp > $outname
     
     if [ -r "$expected" ]; then

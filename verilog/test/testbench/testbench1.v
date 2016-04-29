@@ -1,3 +1,10 @@
+
+    reg `WORD x,y;
+    reg `OP op;
+    wire `WORD z;
+    alu uut(z,op,x,y);
+
+    initial begin
 op = `OPi2f;
 x = 0;
 #1 $display("%h", z);

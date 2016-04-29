@@ -1,3 +1,9 @@
+    reg `WORD x,y;
+    reg `OP op;
+    wire `WORD z;
+    alu uut(z,op,x,y);
+
+    initial begin
 x = 3;
 op = `OPi2f;
 #10;

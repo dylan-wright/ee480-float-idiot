@@ -1,3 +1,10 @@
+
+    reg `WORD x,y;
+    reg `OP op;
+    wire `WORD z;
+    alu uut(z,op,x,y);
+
+    initial begin
 op = `OPaddf;
 x = 16'h4040;
 y = 16'h4040;
