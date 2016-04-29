@@ -83,11 +83,11 @@ module Alu(z, x, y, op);
                         if (x[14:7] < y[14:7]) begin
                             norm = {1'b1, y[6:0]};
                             denorm = {1'b1, x[6:0]} >> (y[14:7]-x[14:7]);
-                            addsign = y[15]&~x[15];
+                            addsign = y[15];
                         end else if (x[14:7] > y[14:7]) begin
                             norm = {1'b1, x[6:0]};
                             denorm = {1'b1, y[6:0]} >> (x[14:7]-y[14:7]);
-                            addsign = x[15]&~y[15];
+                            addsign = x[15];
                         end
                         expnormx = (x[14:7]<y[14:7] ? y[14:7] : x[14:7]) + 
                                     (8-addzshift);
