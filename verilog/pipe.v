@@ -44,11 +44,19 @@ module Alu(z, x, y, op);
     reg `WORD addfrac;
     reg [7:0] diff;
 
+    reg [7:0] recipmantissa;
+
+    reg [7:0] recip [0:127];
+
     lead0s shiftx (normxshift, x);
     lead0s shiftnegx (normnegxshift, negx);
     lead0s shifty (normyshift, y);
     lead0s shiftm (mulfzshift, mulfrac);
     lead0s shifta (addzshift, addfrac);
+
+    initial begin 
+        $readmemh("recip.vmem", recip);
+    end
 
     always @(*) begin
         case (op)
@@ -59,7 +67,11 @@ module Alu(z, x, y, op);
             `OPany: z = (x ? 1 : 0);
             `OPshr: z = (x >> 1);
             `OPdup: z = x;
-            `OPinvf: ;
+            `OPinvf:    begin
+                expnormx = (x[6:0] == 0 ? 254 : 253) - x[14:7];
+                recipmantissa = recip[x[6:0]];
+                z = {x[15], expnormx, recipmantissa[6:0]};
+            end
             `OPaddf:    begin
                 //$display("%h %h",x,y);
                 if (x == 0) begin
