@@ -111,16 +111,15 @@ module Alu(z, x, y, op);
                 end
             end
             `OPf2i: begin
-                expnormx = -(x[14:7]-127-7);
-                if (x[15]) begin
+                expnormx = x[14:7]-127-7;
+                if (expnormx[7]) begin
+                    expnormx = ~expnormx+1;
                     z = {1'b1,x[6:0]}>>expnormx;
-                    //$display("%d", x[14:7]);
-                    //$display("%b", {1'b1, x[6:0]});
-                    //
-                    //$display("%d", expnormx);
-                    z = ~z+1;
                 end else begin
-                    z = {1'b1,x[6:0]}>>expnormx;
+                    z = {1'b1,x[6:0]}<<expnormx;
+                end
+                if (x[15]) begin
+                    z = ~z+1;
                 end
             end
             `OPi2f: begin
