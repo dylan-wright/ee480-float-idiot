@@ -1,0 +1,49 @@
+	.text
+	li	$u0,_main
+	jz	$zero,$u0
+_exit:
+	sys
+	.text
+_0:
+	.data
+	.origin	32768
+	.word	 72
+	.word	101
+	.word	108
+	.word	108
+	.word	111
+	.word	 32
+	.word	 87
+	.word	111
+	.word	114
+	.word	108
+	.word	100
+	.word	 33
+	.word	0
+
+	.text
+	dup	$u0,$sign
+	dup	$u55,$u0
+	li	$u0,printf
+	jz	$zero,$u0
+	dup	$u0,$rv
+	dup	$u0,$zero
+	dup	$rv,$u0
+_1:
+	dup	$ra,$fp
+	add	$ra,$all
+	ld	$ra,$ra
+	dup	$sp,$fp
+	ld	$fp,$sp
+	add	$sp,$one
+	jz	$zero,$ra
+_main:
+	dup	$u0,$sp
+	li	$u1,0xfffe
+	add	$sp,$u1
+	add	$u0,$all
+	st	$fp,$u0
+	add	$u0,$all
+	st	$ra,$u0
+	li	$u0,_0
+	jz	$zero,$u0

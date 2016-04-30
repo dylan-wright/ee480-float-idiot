@@ -812,11 +812,7 @@ defstr(register int spos)
 	asize = 0;
 	while (input[++spos] != '"') {
 		if (++asize > 1) {
-			if ((asize & 7) == 1) {
-				printf("\n\t.word\t");
-			} else {
-				printf(", ");
-			}
+			printf("\n\t.word\t");
 		} else {
 			printf("\t.word\t");
 		}
