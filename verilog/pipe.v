@@ -245,7 +245,7 @@ end
 decode mydecode(op, regdst, s0op, ir);
 alu myalu(res, s1op, s1srcval, s1dstval);
 
-always @(*) ir = mainmem[pc];
+always @(pc) ir = mainmem[pc];
 
 // compute srcval, with value forwarding... also from 2nd word of li
 always @(*) if (s0op == `OPli) srcval = ir; // catch immediate for li

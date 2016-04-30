@@ -57,7 +57,9 @@ do
     sed -n '/__END TB__/,$p' < pipe.v > post.v
     cat pre.v $f post.v > temp.v
     $compiler -Wno-anachronisms temp.v -o temp
-    $engine temp > $outname
+    $engine temp > temp.out
+    sed '/^WARNING.*$/d' < temp.out > $outname
+    
     
     if [ -r "$expected" ]; then
         echo " --> Checking output..."
@@ -72,7 +74,7 @@ do
 done
 echo
 echo "==> Removing temp files..."
-rm -f pre.v temp.v post.v temp
+rm -f pre.v temp.v post.v temp temp.out
 echo
 echo -n "==> Testing has finished: "
 summarize
