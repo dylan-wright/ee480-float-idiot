@@ -1,6 +1,7 @@
 #!/bin/bash
 compiler=iverilog
 engine=vvp
+rep=../reports/junit.xml
 
 numgood=0
 numbad=0
@@ -45,6 +46,7 @@ summarize () {
     fi
 }
 
+rm $rep
 echo "==> Executing testbenches"
 for f in test/testbench/*.v 
 do
@@ -60,6 +62,7 @@ do
     $engine temp > temp.out
     sed '/^WARNING.*$/d' < temp.out > $outname
     
+    echo '<testcase name="'$testname'" classname="testbench.'$testname'">' >> $rep
     if [ -r "$expected" ]; then
         echo " --> Checking output..."
         if diff -u "$expected" $outname > $outname.diff; then
@@ -68,8 +71,13 @@ do
             failure "$testname"
             echo "  --> Diff results:"
             showdiff $outname.diff
+
+            echo '  <error message="'$testname' failed">' >> $rep
+            cat $outname.diff >> $rep
+            echo '  </error>' >> $rep
         fi
     fi
+    echo '</testcase>' >> $rep
 done
 
 echo
@@ -88,6 +96,7 @@ do
     $engine temp > temp.out
     sed '/^WARNING.*$/d' < temp.out > $outname
     
+    echo '<testcase name="'$testname'" classname="testprogs.'$testname'">' >> $rep
     if [ -r "$expected" ]; then
         echo " --> Checking output..."
         if diff -u "$expected" $outname > $outname.diff; then
@@ -96,8 +105,13 @@ do
             failure "$testname"
             echo "  --> Diff results:"
             showdiff $outname.diff
+
+            echo '  <error message="'$testname' failed">' >> $rep
+            cat $outname.diff >> $rep
+            echo '  </error>' >> $rep
         fi
     fi
+    echo '</testcase>' >> $rep
     rm $testname.vmem
 done
 
