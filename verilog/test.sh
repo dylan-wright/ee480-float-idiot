@@ -62,22 +62,24 @@ do
     $engine temp > temp.out
     sed '/^WARNING.*$/d' < temp.out > $outname
     
-    echo '<testcase name="'$testname'" classname="testbench.'$testname'">' >> $rep
+    echo '<testcase name="'$testname'" classname="testbench"' >> $rep
     if [ -r "$expected" ]; then
         echo " --> Checking output..."
         if diff -u "$expected" $outname > $outname.diff; then
+            echo '/>' >> $rep
             success "$testname"
         else 
             failure "$testname"
             echo "  --> Diff results:"
             showdiff $outname.diff
 
+            echo '>' >> $rep
             echo '  <error message="'$testname' failed">' >> $rep
             cat $outname.diff >> $rep
             echo '  </error>' >> $rep
+            echo '</testcase>' >> $rep
         fi
     fi
-    echo '</testcase>' >> $rep
 done
 
 echo
@@ -96,22 +98,24 @@ do
     $engine temp > temp.out
     sed '/^WARNING.*$/d' < temp.out > $outname
     
-    echo '<testcase name="'$testname'" classname="testprogs.'$testname'">' >> $rep
+    echo '<testcase name="'$testname'" classname="testprogs"' >> $rep
     if [ -r "$expected" ]; then
         echo " --> Checking output..."
         if diff -u "$expected" $outname > $outname.diff; then
             success "$testname"
+
+            echo '/>' >> $rep
         else 
             failure "$testname"
             echo "  --> Diff results:"
             showdiff $outname.diff
-
+            
+            echo '>' >> $rep
             echo '  <error message="'$testname' failed">' >> $rep
             cat $outname.diff >> $rep
             echo '  </error>' >> $rep
         fi
     fi
-    echo '</testcase>' >> $rep
     rm $testname.vmem
 done
 
