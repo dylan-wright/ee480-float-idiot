@@ -46,7 +46,7 @@ summarize () {
     fi
 }
 
-rm $rep
+echo "<testsuite>" > $rep
 echo "==> Executing testbenches"
 for f in test/testbench/*.v 
 do
@@ -62,24 +62,22 @@ do
     $engine temp > temp.out
     sed '/^WARNING.*$/d' < temp.out > $outname
     
-    echo '<testcase name="'$testname'" classname="testbench"' >> $rep
+    echo '<testcase name="'$testname'" classname="testbench">' >> $rep
     if [ -r "$expected" ]; then
         echo " --> Checking output..."
         if diff -u "$expected" $outname > $outname.diff; then
-            echo '/>' >> $rep
             success "$testname"
         else 
             failure "$testname"
             echo "  --> Diff results:"
             showdiff $outname.diff
 
-            echo '>' >> $rep
             echo '  <error message="'$testname' failed">' >> $rep
             cat $outname.diff >> $rep
             echo '  </error>' >> $rep
-            echo '</testcase>' >> $rep
         fi
     fi
+    echo '</testcase>' >> $rep
 done
 
 echo
@@ -98,27 +96,25 @@ do
     $engine temp > temp.out
     sed '/^WARNING.*$/d' < temp.out > $outname
     
-    echo '<testcase name="'$testname'" classname="testprogs"' >> $rep
+    echo '<testcase name="'$testname'" classname="testprogs">' >> $rep
     if [ -r "$expected" ]; then
         echo " --> Checking output..."
         if diff -u "$expected" $outname > $outname.diff; then
             success "$testname"
-
-            echo '/>' >> $rep
         else 
             failure "$testname"
             echo "  --> Diff results:"
             showdiff $outname.diff
             
-            echo '>' >> $rep
             echo '  <error message="'$testname' failed">' >> $rep
             cat $outname.diff >> $rep
             echo '  </error>' >> $rep
         fi
     fi
     rm $testname.vmem
+    echo "</testcase>" >> $rep
 done
-
+echo "</testsuite>" >> $rep
 echo
 echo "==> Removing temp files..."
 rm -f pre.v temp.v post.v temp temp.out
