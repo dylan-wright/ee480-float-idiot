@@ -106,7 +106,6 @@ module alu(z, op, x, y);
             `OPxor: z = y ^ x;
             `OPany: z = (x ? 1 : 0);
             `OPshr: z = (x >> 1);
-            `OPdup: z = x;
             `OPinvf:    begin
                 if (x == 0) begin
                     z = 0;
@@ -192,6 +191,7 @@ module alu(z, op, x, y);
                     z = {x[15], expnormx, normx[15:9]};
                 end
             end
+            default: z = x;
         endcase
     end
 endmodule
@@ -245,7 +245,7 @@ end
 decode mydecode(op, regdst, s0op, ir);
 alu myalu(res, s1op, s1srcval, s1dstval);
 
-always @(pc) ir = mainmem[pc];
+always @(op) ir = mainmem[pc];
 
 // compute srcval, with value forwarding... also from 2nd word of li
 always @(*) if (s0op == `OPli) srcval = ir; // catch immediate for li
