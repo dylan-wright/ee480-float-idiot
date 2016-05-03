@@ -245,7 +245,7 @@ end
 decode mydecode(op, regdst, s0op, ir);
 alu myalu(res, s1op, s1srcval, s1dstval);
 
-always @(op) ir = mainmem[pc];
+always @(pc) ir = mainmem[pc];
 
 // compute srcval, with value forwarding... also from 2nd word of li
 always @(*) if (s0op == `OPli) srcval = ir; // catch immediate for li
@@ -292,7 +292,7 @@ always @(posedge clk) if (!halt) begin
   s2regdst <= s1regdst;
   s2val <= ((s1op == `OPld) ? mainmem[s1srcval] : res);
   if (s1op == `OPst) mainmem[s1srcval] <= s1dstval;
-  if (s1op == `OPsys) halt <= 1;
+  if (s1op == `OPsys) begin halt <= 1; $display("%h", pc); end
 end
 
 // Register Write
@@ -313,11 +313,12 @@ initial begin
   $dumpvars(0, PE);
   #10 reset = 1;
   #10 reset = 0;
-  while (!halted && (i < 200)) begin
+  while (!halted && (i < 20000)) begin
     #10 clk = 1;
     #10 clk = 0;
     i=i+1;
   end
+  if (i >= 20000) begin $display("Timeout"); end
   $finish;
 //__END TB__
 end
