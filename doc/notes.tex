@@ -34,7 +34,7 @@ language programs in the IDIOT ISA.\cite{aik}
 \subsection{BAD}
 BAD (Barely Acceptable Decimal) is the floating point format implemented by
 this project. BAD is a specification developed for the Spring 2016 version
-of EE 480.\cite{idiot-float} This format is a varient of IEEE Std 754 
+of EE 480.\cite{idiot-float} This format is a variant of IEEE Std 754 
 \texttt{binary32}.\cite{ieee-754} BAD drops all subnormal values except for
 positive zero and truncates the 16 least significant bits of the significand.
 
@@ -58,7 +58,7 @@ programs.
 to build all .idiot programs in the directory. This produces the .vmem files
 which can be used to exercise the processor.
 \subsubsection{\texttt{verilog/}}
-This directory is dedicated to the verilog inplementation of the project and
+This directory is dedicated to the verilog implementation of the project and
 the framework used to test it. Of particular interest are the following files:
 \paragraph{\texttt{pipe.v}} This file is the verilog source code which 
 implements the processor. 
@@ -95,28 +95,59 @@ is not positive 0 is passed directly through the ALU.
 \subsubsection{\texttt{invf}}
 (invert float) is an instruction which computes the inverse of a 16-bit
 float. This instruction inverts the x signal of the ALU. This is done using
-a look up table provided for the assignment.\cite{invf-lut}
+a look up table provided for the assignment.\cite{invf-lut} For the special
+case of the subnormal positive zero, zero is passed through the alu.
 \subsection{Pipeline Integration}
+The floating point alu was built into the alu module from the previous project.
+This module is instantiated by the pipelined processor provided as the 
+solution to the previous project.\cite{a3-sol}
 
 \section{Issues}
-
 \section{Testing}
 \subsection{Continuous Integration}
-In an effort to increase productivity and test usefullness, this group has
+In an effort to increase productivity and test usefulness, this group has
 been using a Jenkins continuous integration server. This server is running
 on a server Dylan Wright operates.\footnote{\url{intellproject.com:8090}} 
 The server is configured to attempt to
-build whenever the project GitHub recieves a commit. The build process makes
+build whenever the project GitHub receives a commit. The build process makes
 all source files and reports if any step fails. Additionally it runs the
 unit test script (\texttt{verilog/test.sh}) which will cause the build to fail
-if any test case fails.
+if any test case fails. The testscript also outputs a junit xml report to
+\texttt{reports/junit.xml}. The xml file is used to generated test result
+graphs by Jenkins. 
+
 \subsection{Floating Point Unit Testing}
+The test script tests floating point operations with the unittests in the
+\texttt{verilog/tests/testbench/} directory. The files with the .v extensions
+are inserted into the testbench in the main verilog file. 
 \subsection{Pipeline Program Testing}
+The test script tests the pipeline by using the unittests in the 
+\texttt{verilog/tests/testprogs/} directory. The files with the .vmem 
+extensions are concatenated together and the resulting file is used to 
+initialize the memory. The testbench in the main verilog file by default (not
+floating point unittests) resets the processor and runs until the processor
+halts. 
 
 \section{Philosophy}
 \subsection{Sufficiency}
+The floating point instruction set is sufficient for the context of this
+project. Implementing features like comparison in hardware would be a nice
+addition but can be easily done by the compiler instead of the hardware. By
+leaving much of the complexity in the software domain the hardware is simpler
+to design and test.
+
 \subsection{Necessity}
+The floating point instructions implemented here represent a distinct advantage
+over implementation in software. These instructions occur often enough to
+warrant implementation in hardware. Taking more than one cycle to perform
+a floating point multiply or addition would significantly affect the 
+performance of certain programs.
+
 \subsection{Usefulness}
+The format implemented here is mostly academic but it is used in some real 
+world situations. The larger dynamic range of this format is particularly 
+advantageous. While binary 16 is also a useful format, the top half of binary 32
+is equally useful in this context.
 
 \bibliographystyle{IEEEtran}
 \bibliography{notes}
