@@ -103,6 +103,14 @@ This module is instantiated by the pipelined processor provided as the
 solution to the previous project.\cite{a3-sol}
 
 \section{Issues}
+In order to use the provided \texttt{idioc} compiler, the following changes
+were made:
+\begin{itemize}
+    \item Fixed issue with function labels missing an underscore
+    \item Fixed issue with data words being output as a list of values which
+        was not being accepted by AIK
+\end{itemize}
+
 \section{Testing}
 \subsection{Continuous Integration}
 In an effort to increase productivity and test usefulness, this group has
