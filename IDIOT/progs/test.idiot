@@ -1,0 +1,110 @@
+.data
+test:
+.word 0x601
+.text
+main:
+li   $u0,0x1003
+add  $u0,$one ; u0=0x1004
+li   $u54,0x1004
+xor  $u54,$u0     ;compare for equality
+sz   $u54
+sys               ;if the buck stopped here, bad!
+li   $u1,0x4321
+li   $u2,0x1234
+and  $u1,$u2 ; u1=0x0220
+li   $u53,0x0220
+xor  $u53,$u1     ;compare for equality
+sz   $u53
+sys               ;if the buck stopped here, bad!
+li   $u3,0x4321
+or   $u2,$u3 ; u2=0x5335
+li   $u52,0x5335
+xor  $u52,$u2     ;compare for equality
+sz   $u52
+sys               ;if the buck stopped here, bad!
+li   $u4,0x1234
+xor  $u3,$u4 ; u3=0x5115
+li   $u55,0x5115
+xor  $u55,$u3     ;compare for equality
+sz   $u55
+sys               ;if the buck stopped here, bad!
+any  $u4,$u4 ; u4=1
+li   $u51,0x0001
+xor  $u51,$u4     ;compare for equality
+sz   $u51
+sys               ;if the buck stopped here, bad!
+any  $u5,$zero ; u5=0
+li   $u50,0x0000
+xor  $u50,$u5     ;compare for equality
+sz   $u50
+sys               ;if the buck stopped here, bad!
+dup  $u6,$sign ; u6=0x8000
+li   $u49,0x8000
+xor  $u49,$u6     ;compare for equality
+sz   $u49
+sys               ;if the buck stopped here, bad!
+li   $u7,0x8421
+shr  $u7,$u7 ; u7=0x4210
+li   $u48,0x4210
+xor  $u48,$u7     ;compare for equality
+sz   $u48
+sys               ;if the buck stopped here, bad!
+li   $u8,test ; u8=0x8000
+li   $u9,0x0042 ; u9=0x0042
+st   $u9,$u8 ; test=42
+ld   $u10,$u8 ; u10=0x0042
+li   $u47,0x0042
+xor  $u47,$u10     ;compare for equality
+sz   $u47
+sys               ;if the buck stopped here, bad!
+dup  $u11,$zero ; u11=0
+li   $u12,taken
+jz   $u11,$u12
+dup  $u11,$one ; should not happen
+taken:
+dup  $u12,$one
+li   $u13,nottaken
+jz   $u12,$u13
+dup  $u12,$all ; u12=0xffff
+nottaken:
+sz   $u13
+dup  $u13,$zero ; u13=0x0000
+dup  $u14,$zero ; u14=0x0000
+sz   $u14
+dup  $u14,$one
+dup  $u15,$zero ; u15=0x0000
+; floating point
+li   $u16,0x8020 ; u16=-32736
+i2f  $u16,$u16 ; u16=0xc6ff
+li   $u46,0xc6ff
+xor  $u46,$u16     ;compare for equality
+sz   $u46
+sys               ;if the buck stopped here, bad!
+li   $u17,0xc6ff
+f2i  $u17,$u17 ; u17=0x
+li   $u45,0x8020
+xor  $u45,$u17     ;compare for equality
+sz   $u45
+sys               ;if the buck stopped here, bad!
+li   $u18,0x44b3
+invf $u18,$u18 ; u18=0x3a37
+li   $u44,0x3a37
+xor  $u44,$u18     ;compare for equality
+sz   $u44
+sys               ;if the buck stopped here, bad!
+li   $u19,0x4228
+li   $u20,0x4479
+mulf $u19,$u20 ; u19=0x4723
+li   $u43,0x4723
+xor  $u43,$u19     ;compare for equality
+sz   $u43
+sys               ;if the buck stopped here, bad!
+li   $u21,0xc150
+li   $u22,0x425c
+addf $u21,$u22 ; u21=0x4228
+li   $u42,0x4228
+xor  $u42,$u21     ;compare for equality
+sz   $u42
+sys               ;if the buck stopped here, bad!
+good:
+dup  $u15,$all ; should not execute
